@@ -1,0 +1,5 @@
+explorin
+.vscode
+__pycache__
+outfile*
+tmp.html
