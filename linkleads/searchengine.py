@@ -23,7 +23,7 @@ class SearchEngine:
     outfile = ""
     date = None
     url = None
-    _LIMIT=1000
+    _LIMIT=100
     results = []
     terms = terms
     fb_q = '"Page created - {} {}, {}"'
@@ -79,10 +79,14 @@ class SearchEngine:
     def writeToFile(self, mode="a", f=None, data=None):
         f = self.outfile if f is None else f
         data = self.results if data is None else data
-        with open(self.outfile, mode, newline='') as file:
+        with open(self.outfile, mode, newline='', encoding='utf-16') as file:
             csv_file = csv.writer(file)
             for item in data:
-                csv_file.writerow([item['link'], item['site'], item['engine'], item['term']])
+                try:
+                    csv_file.writerow([item['link'], item['site'], item['engine'], item['term']])
+                except:
+                    # Failed to write item, Probaly a encoding issue0
+                    pass
 
 
 class Google(SearchEngine):
@@ -171,10 +175,10 @@ class Bing(SearchEngine):
     def getFbResults(self, term):
         query = f'{self.fb_q} site: facebook.com intitle: {term}'
         # query = '"Page created - February 7, 2021" site: facebook.com intitle: Home Improvement'
-        # url = self.url + urlencode({"q": query})
+        url = self.url + urlencode({'q': query, 'pq': query.lower(), 'qs': 'n', 'form': 'QBRE', 'sp': '-1', 'first': '0'})
         # url = 'https://www.bing.com/search?q=%22Page%20created%20-%20February%205%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20Home%20Improvement'
         # url = 'https://www.bing.com/search?q=%22Page%20created%20-%20February%205%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20Home%20Improvement&pq=%22page%20created%20-%20february%207%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20home%20improvement'
-        url = 'https://www.bing.com/search?q=%22Page%20created%20-%20February%205%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20Home%20Improvement&pq=%22page%20created%20-%20february%207%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20home%20improvement&qs=n&form=QBRE&sp=-1'
+        xxx = 'https://www.bing.com/search?q=%22Page%20created%20-%20February%205%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20Home%20Improvement&pq=%22page%20created%20-%20february%207%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20home%20improvement&qs=n&form=QBRE&sp=-1'
         
         # url = self.url + query
         # url = "https://www.bing.com/search?q=%22%22Page%20created%20-%20February%207%22%20site:facebook.com%20intitle:%22Home%20Improvement%22"
@@ -190,7 +194,8 @@ class Bing(SearchEngine):
             # url = self.url + query
             # url = self.url +  urlencode({"q": query})
             # url = self.url +  url
-            agent = self.agents[random.randrange(len(self.agents))]
+            # agent = self.agents[random.randrange(len(self.agents))]
+            agent = self.agents[0]
             headers = {"user-agent" : agent}
             print(agent)
             if url == previousurl:
@@ -228,7 +233,8 @@ class Bing(SearchEngine):
                                 nlinks += 1
                         except AttributeError as ex:
                             if link.get('title') and  link.get('title').startswith('Next') & href.startswith('/search?'):
-                                url = f'{self.url}{href}'
+                                npage = re.search("&first=(\d\d?\d?)", href).group(1)
+                                url = re.sub(r"&first=(\d\d?\d?)", f'&first={npage}', url)
                                 break
                             continue
                         except Exception as ex:
