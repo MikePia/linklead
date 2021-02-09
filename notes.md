@@ -59,16 +59,102 @@ https://www.google.com/search?q="Page+created+-+February+7,+2021"+inurl:facebook
 
 # Bing
 "Page created - February 7, 2021" site:facebook.com intitle: Home Improvement
+"Page created - February 7, 2021" site:facebook.com intitle: Home Improvement
 "Page created - February 7, 2021" site: facebook.com intitle: Home Improvement
 https://www.bing.com/search?
-q=%22Page%20created%20-%20February%207%2C%202021%22%20site%3Afacebook.com%20intitle%3AHome%20Improvement
+q="Page 20created 20- 20February 207 2C 202021" 20site:facebook.com 20intitle:Home 20Improvement
 &qs=n
 &form=QBRE
 &sp=-1
-&pq=%22page%20created%20-%20february%205%2C%202021%22%20site%3Afacebook.com%20intitle%3Ahome%20improvement
+&pq="page 20created 20- 20february 205 2C 202021" site:facebook.com 20intitle:home 20improvement
 &sc=0-76
-&sk=
-&cvid=D6BA1A570F0B4D0582EB5A3346B5C5A6
+&first=0
+
+# Yahoo
+"Page created - February 7, 2021" site:facebook.com intitle: Home Improvement
+https://search.yahoo.com/search
+p="Page+created+-+February+8 2C+2021"+site:facebook.com+intitle:+Home+Improvement
+&fr2=sb-top
+&fr=yfp-t
+&fp=1
+
+https://search.yahoo.com/search?p="Page+created+-+February+5,+2021"+site:facebook.com+intitle:+Home+Improvement&b=0
+&fp=1
+&fr2=sa-gp-search
+&n=30
+
+https://search.yahoo.com/search?p=%22Page+created+-+February+5%2C+2021%22+site%3A+facebook.com+intitle%3A+Home+Improvement&b=0
+&fr2=sb-top
+
+
+### Yahoo next
+https://search.yahoo.com/search?p="Page+created+-+February+5,+2021"+site:facebook.com+intitle:+Home+Improvement
+&b=11
+&pz=10
+&bct=0
+&xargs=0
+
+https://search.yahoo.com/searchu?
+p="Page+created+-+February+5,+2021"+site:facebook.com+intitle:+Home+Improvement
+&pz=10
+&bct=0
+&b=21
+&pz=10
+&bct=0
+&xargs=0
+
+
+
+
+<a class="next" 
+href="
+https://search.yahoo.com/search;
+_ylt=Awr9BNYYLyFgf7kArNJXNyoA;_ylu=Y29sbwNncTEEcG9zAzEEdnRpZANDMDkzNF8xBHNlYwNwYWdpbmF0aW9u?
+p="Page+created+-+February+5,+2021"+site:facebook.com+intitle:+Home+Improvement
+&amp;fr=yfp-t
+&amp;fr2=sb-top
+&amp;fp=1
+&amp;b=11
+&amp;pz=10
+&amp;bct=0
+&amp;xargs=0" 
+referrerpolicy="unsafe-url">
+
+<a href="
+/search?
+q=&amp;
+&amp;biw=763
+&amp;bih=895
+&amp;ei=MDEhYOuIKdKPtAaDuZigCQ
+&amp;start=10
+&amp;sa=N
+&amp;ved=2ahUKEwjr4NPGp9ruAhXSB80KHYMcBpQQ8NMDegQIGhBI"
+
+
+
+<a 
+href=
+"/search?
+q= &amp ;
+&amp;biw=1755
+&amp;bih=895
+&amp;ei=mDAhYKn8EcettQbu6pGwBA
+&amp;start=20
+&amp;sa=N
+&amp;ved=2ahUKEwipqP_9ptruAhXHVs0KHW51BEY4ChDw0wN6BAgJEEg" 
+### Yahoo links are embedded in
+'https://r.search.yahoo.com/_ylt=Awr9IMzatyFgFAYAJ3tXNyoA;_ylu=Y29sbwNncTEEcG9zAzQEdnRpZAMEc2VjA3Ny/RV=2/RE=1612851290/RO=10/RU=https%3a%2f%2fwww.facebook.com%2fmonilove1993%2f/RK=2/RS=gMY2nOif0zfGmP2Hehw8LTljIaM-'
+
+<a href="
+https://search.yahoo.com/search?
+p=%22Page+created+-+February+5%2C+2021%22+site%3A+facebook.com+intitle%3A+Home+Improvement
+&amp;b=41
+&amp;pz=10
+&amp;bct=0
+&amp;xargs=0"
+
+ referrerpolicy="unsafe-url" title="Results 41-50">5</a>
+
 
 ### originals from DT
 inurl:bbb.org "Accredited Since:2/5/2021" intitle:Construction
@@ -77,7 +163,7 @@ intext:Proudly created with Wix.com "construction"
 this 1 i have to change the time created to 24 hours or less
 
 
-https://www.bing.com/search?q=%22Page+created+-+February+7%2C+2021%22+site%3A+facebook.com+intitle%3A+Home+Improvement
+https://www.bing.com/search?q="Page+created+-+February+7 2C+2021"+site:+facebook.com+intitle:+Home+Improvement
 &form=QBLH
 &sp=-1
 &pq=
@@ -88,22 +174,10 @@ https://www.bing.com/search?q=%22Page+created+-+February+7%2C+2021%22+site%3A+fa
 
 ### Bing next
 https://www.bing.com/search?
-q=%22Page+created+-+February+5%2c+2021%22+site%3a+facebook.com+intitle%3a+Home+Improvement
+q="Page+created+-+February+5 2c+2021"+site:+facebook.com+intitle:+Home+Improvement
 &first=12
 &FORM=PORE
 
-https://www.bing.com/search?q=%22Page%20created%20-%20February%205%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20Home%20Improvement&pq=%22page%20created%20-%20february%207%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20home%20improvement&qs=n&form=QBRE&sp=-1
-&sc=0-78&sk=&cvid=84AE0F1374034EFABD9AD6985649DFFB
-
-https://www.bing.com/search?
-q=%22Page+created+-+February+5%2c+2021%22+site%3a+facebook.com+intitle%3a+Home+Improvement
-&first=22&FORM=PERE1
-
- 'https://www.bing.com/search?
- q=%22Page%20created%20-%20February%205%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20Home%20Improvement&pq=%22page%20created%20-%20february%207%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20home%20improvement
- &qs=n
- &form=QBRE
- &sp=-1'
 
 
 ### The othere 2

@@ -2,4 +2,5 @@ explorin
 .vscode
 __pycache__
 outfile*
+*.csv
 tmp.html

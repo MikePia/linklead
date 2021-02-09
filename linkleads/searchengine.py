@@ -6,7 +6,7 @@ import os
 import random
 import re
 import requests
-from urllib.parse import urlparse, urlencode, quote
+from urllib.parse import urlparse, urlencode, unquote
 
 from linkleads.terms import terms
 
@@ -96,7 +96,6 @@ class Google(SearchEngine):
         self.fb_q = self.fb_q.format(self.date.strftime("%B"),
                                      str(self.date.day),
                                      self.date.strftime("%Y"))
-        print()
 
     
     def getFbResults(self, term):
@@ -146,7 +145,6 @@ class Google(SearchEngine):
                                 x = re.search("&start=([0-9]+)", href)
                                 if x and x.group(1):
                                     nglinks = x.group(1)
-                                    print(x.group(1))
                                     break
                             continue
                         except Exception as ex:
@@ -176,28 +174,15 @@ class Bing(SearchEngine):
         query = f'{self.fb_q} site: facebook.com intitle: {term}'
         # query = '"Page created - February 7, 2021" site: facebook.com intitle: Home Improvement'
         url = self.url + urlencode({'q': query, 'pq': query.lower(), 'qs': 'n', 'form': 'QBRE', 'sp': '-1', 'first': '0'})
-        # url = 'https://www.bing.com/search?q=%22Page%20created%20-%20February%205%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20Home%20Improvement'
-        # url = 'https://www.bing.com/search?q=%22Page%20created%20-%20February%205%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20Home%20Improvement&pq=%22page%20created%20-%20february%207%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20home%20improvement'
-        xxx = 'https://www.bing.com/search?q=%22Page%20created%20-%20February%205%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20Home%20Improvement&pq=%22page%20created%20-%20february%207%2C%202021%22%20site%3A%20facebook.com%20intitle%3A%20home%20improvement&qs=n&form=QBRE&sp=-1'
         
-        # url = self.url + query
-        # url = "https://www.bing.com/search?q=%22%22Page%20created%20-%20February%207%22%20site:facebook.com%20intitle:%22Home%20Improvement%22"
-        # xxx = 'https://www.bing.com/search?q=%22Page%20created%20-%20February%207%2C%202021%22%20site%3Afacebook.com%20intitle%3AHome%20Improvement'
-        # yyy = 'https://www.bing.com/search?q=%22Page%20created%20-%20February%207%2C%202021%22%20site%3Afacebook.com%20intitle%3AHome%20Improvement'
-        # zzz = 'https://www.bing.com/search?q=%22Page+created+-+February+7%2C+2021%22+site%3A+facebook.com+intitle%3A+Home+Improvement'
         
         nglinks = 0
         nlinks = 0
         previousurl = ""
-        # resp = requests.get(URL, headers=headers)
         while nlinks < self._LIMIT:
-            # url = self.url + query
-            # url = self.url +  urlencode({"q": query})
-            # url = self.url +  url
             # agent = self.agents[random.randrange(len(self.agents))]
             agent = self.agents[0]
             headers = {"user-agent" : agent}
-            print(agent)
             if url == previousurl:
                 break
             previousurl = url
@@ -206,7 +191,6 @@ class Bing(SearchEngine):
                 if html.status_code == 200:
                     soup = BeautifulSoup(html.text, 'html.parser')
                     links = soup.find_all('a')
-                    # print(html.text)
                     f = open("tmp.html", "w", encoding='utf-16')
                     f.write(html.text)
                     f.close()
@@ -231,6 +215,8 @@ class Bing(SearchEngine):
                                     "date": self.date.strftime("%Y/%m/%d")
                                 })
                                 nlinks += 1
+                                if not nlinks % 25:
+                                    print(nlinks, "links", term)
                         except AttributeError as ex:
                             if link.get('title') and  link.get('title').startswith('Next') & href.startswith('/search?'):
                                 npage = re.search("&first=(\d\d?\d?)", href).group(1)
@@ -238,7 +224,6 @@ class Bing(SearchEngine):
                                 break
                             continue
                         except Exception as ex:
-                            print(str(type(ex)), ex)
                             continue
             except Exception as ex:
                 print(str(ex))
@@ -253,12 +238,89 @@ class Bing(SearchEngine):
         print('notimplemnted')
 
 class Yahoo(SearchEngine):
-    def __init__(self, outfile):
-        super().__init__(outfile)
-        self.url = 'https://www.yahoo.com/search?q={query}&start={nglinks}'
+    def __init__(self, outfile=None, date=None):
+        super().__init__(outfile, date)
+        self.url = 'https://search.yahoo.com/search?'
+        self.fb_q = self.fb_q.format(self.date.strftime("%B"),
+                                     str(self.date.day),
+                                     self.date.strftime("%Y"))
     
-    def getFbResults(self, query):
-        print('notimplemnted')
+    def formatUrl(self, term, start):
+        query = f'{self.fb_q} site: facebook.com intitle: {term}'
+        url = self.url + urlencode({'p': query, 'b': start})
+        return url
+
+    def getFbResults(self, term):
+        """
+        The links are embedded <a href=https://search.yahoo.com/ .... /RU=https://www.facebook.com... // >
+        Everything is encoded --> {0x3a: ':', 0x2f: '/'}
+        """
+        url = self.formatUrl(term, '0')
+        
+        
+        nglinks = 0
+        nlinks = 0
+        previousurl = ""
+        while nlinks < self._LIMIT:
+            # agent = self.agents[random.randrange(len(self.agents))]
+            agent = self.agents[0]
+            headers = {"user-agent" : agent}
+            if url == previousurl:
+                break
+            previousurl = url
+            try:
+                html = requests.get(url, headers=headers)
+                if html.status_code == 200:
+                    soup = BeautifulSoup(html.text, 'html.parser')
+                    results = soup.find(id="results")
+                    # mydivs = soup.findAll("div", {"class": "stylelistrow"})
+                    links = results.find_all('a')
+
+                    for link in links:
+                        try:
+                            href = link.get('href')
+                            href =  unquote(href)
+                            href = re.search('(https?://www\.facebook.*)//', href).group(1)
+                        except: 
+                            if re.match('https?://search.yahoo.com/search', link.get('href')):
+                                href = ''
+                                print()
+                                pass
+                            else:
+                                continue
+                        try:
+                            m = re.search(r"(?P<url>https?://[^\s]+)", href)
+                            n = m.group('url')
+                            rul = n.split('&')[0]
+                            domain = urlparse(rul)
+                            if re.search('yahoo.com', domain.netloc):
+                                continue
+                            else:
+                                self.results.append({
+                                    "link": rul,
+                                    "site": 'facebook',
+                                    "engine": "yahoo",
+                                    "term": term,
+                                    "date": self.date.strftime("%Y/%m/%d")
+                                })
+                                nlinks += 1
+                                if not nlinks % 25:
+                                    print(nlinks, "links", term)
+                        except AttributeError as ex:
+                            if link.text == 'Next':
+                                href = link.get('href')
+                                href = unquote(href)
+                                npage = re.search("&b=(\d\d?\d?)", href).group(1)
+                                url = re.sub(r"&b=(\d\d?\d?)", f'&b={npage}', url)
+                                break
+                            continue
+                        except Exception as ex:
+                            continue
+            except Exception as ex:
+                print(str(ex))
+
+        self.writeToFile()
+        self.results = []
 
     def getBbbResults(self, query):
         print('notimplemnted')
@@ -266,13 +328,21 @@ class Yahoo(SearchEngine):
     def getWixResults(self, query):
         print('notimplemnted')
 
+def test_yahooFormatUrl():
+    expected = 'https://search.yahoo.com/search?p=%22Page+created+-+February+5%2C+2021%22+site%3A+facebook.com+intitle%3A+Home+Improvement&b=0'
+    input = 'Home Improvement'
+    y = Yahoo(outfile="yahoo8.csv", date=d)
+    result = y.formatUrl(input, '0')
+    assert result == expected
 
 if __name__ == '__main__':
     # g = Google()
     # g.getSearchResults()
     d = dt.datetime(2021, 2, 5)
-    b = Bing(date=d)
-    b.getSearchResults()
+    # b = Bing(date=d)
+    # b.getSearchResults()
+    y = Yahoo(outfile="yahoo8.csv", date=d)
+    y.getSearchResults()
 
 
 
