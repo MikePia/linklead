@@ -19,13 +19,16 @@ import datetime as dt
 searchday = dt.datetime(2021, 1, 1)
 # searchday = dt.datetime(2021, 1, 1, 9, 30, 0)
 
-# bbbtime  applies to bbb searches only currently
-# wixtime  applies to wix searches only currently
-# available values are ["d", "w", "m"]
+# timebbt  applies to bbb searches only currently
+# timewix  applies to wix searches only currently
+# available values are ["d", "w", "m", "y", 'c']
+# c is for custom, If you you choose custom, then then custom dates needs to be filled in
 # Implementing day week and month only because noting else is supported by all three 
 
-bbbtime = "d"
-wixtime = "w"
+timebbb = 'y'
+timewix = 'd'
+
+bingcustomdate = (dt.datetime(2020, 11, 1), dt.datetime(2021, 2, 5))
 
 
 ############################# Search Terms #######################################
@@ -41,24 +44,50 @@ fb_q = '"Page created - {month} {day}, {year}"'
 bbb_q = '"Accredited Since:{day}/{month}/{year}"'
 # bbb_q = '"Accredited Since:" {year}'
 # bbb_q = "Accredited"
-wix_q =  'intext:Proudly created with Wix.com "construction"'
+wix_q =  'Proudly created with Wix.com'
 
 ############################# Save to file ###########################################
 # They can be set to the same or different outfs. {} will place a date
 outf = 'outfile_{}.csv'
 
 ############################# misc ############################
-# Introduce time between hits. 
+# Introduce time between new searches so as not to tax the server and or get 429'd. 
 randomsleep = (.5, 1.1)
 # randomsleep = None
 
 
 ########### Do not alter below line ##################################################
+def getBingCustomDates(beg, end):
+    '''
+    This gets the strange format for Bings custom date which looks something like: &filters=ex1:"ez5_18423_18659"
+    18628 = Jan 1 2021,
+    18629 = Jan 2 2021,
+    '''
+    a = dt.datetime(2021, 1, 1)
+    JAN2021 =  18628
+    begn = (beg - a).days + JAN2021
+    endn = (end - a).days + JAN2021
+    return f'ex1:"ez5_{begn}_{endn}"'
+
+def getBingTimeParam(tt):
+    if not tt:
+        return ''
+    assert tt in ['d', 'w', 'm', 'y', 'c']
+    if tt in ['y', 'c']:
+        if tt == 'y':
+            bt = getBingCustomDates(dt.datetime.today()- dt.timedelta(days=365), dt.datetime.today(), )
+        else:
+            bt = getBingCustomDates(*bingcustomdate)
+    else:
+        bt = {'h': 'ex1:"ez1"', 'w': 'ex1:"ez2"', 'd': 'ex1:"ez3"'}[tt]
+    return bt
+
 def formatTerms(dadate=None):
     global fb_q
     global bbb_q
     global outf
     global searchday 
+    global timebbb
     if dadate is None:
         dadate = searchday
 
@@ -66,9 +95,13 @@ def formatTerms(dadate=None):
     if bbb_q:
         bbb = bbb_q.format(day=dadate.day, month=dadate.month, year=dadate.year)
     out = outf.format(dadate.strftime("%Y%m%d_%H-%M-%S"))
-    return fb, bbb, out
+    bt =  getBingTimeParam(timebbb)
+    wt = getBingTimeParam(timewix)
+    yt = timewix if timewix in ['d', 'm', 'y'] else ''
 
-fbsearch, bbbsearch, outfile = formatTerms()
+    return fb, bbb, out, bt, wt, yt
+
+fbsearch, bbbsearch, outfile, bbbtime, bingwixtime, yahoowixtime = formatTerms()
 print()
 
 
