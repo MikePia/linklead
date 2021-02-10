@@ -4,3 +4,7 @@ __pycache__
 outfile*
 *.csv
 tmp.html
+notes.md
+*.ipynb
+*.ipynb*
+tmp*
