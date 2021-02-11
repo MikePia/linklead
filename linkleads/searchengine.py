@@ -466,31 +466,8 @@ class Yahoo(SearchEngine):
         super().__init__(outfile, date, config)
         self.url = 'https://search.yahoo.com/search?'
     
-    def formatUrl(self, term, start):
-        '''
-        fb: https://search.yahoo.com/search?p="Page+created+-+February+5,+2021"+site:facebook.com+intitle:+Home+Improvement&b=21
-        url = self.url + urlencode({'q': query, 'pq': query.lower(), 'qs': 'n', 'form': 'QBRE', 'sp': '-1', 'first': '0'})
-        urlencode({'q': query, 'pq': query.lower(), 'qs': 'n', 'form': 'QBRE', 'sp': '-1', 'first': '0'})
-        '''
-        query = f'{self.fb_q} site: facebook.com intitle: {term}'
 
-        url = self.url + urlencode({'p': query, 'b': start})
-        return url
-
-    def getFbResults(self, term, geturl=False):
-        '''
-        fb: https://www.google.com/search?"Page created - January 01, 2021" inurl:facebook.com intitle:Home Improvement
-        '''
-        url = self.formatUrl(term, '0')
-        query = f'{self.fb_q} site:facebook.com intitle:{term}'
-        url = self.url + urlencode({'p': query, 'b': '0'})
-        if geturl:
-            print(url)
-            return
-        self.getYahooResults(url, term)
-
-    def getYahooResults(self, url, term):
-        
+    def getYahooResults(self, url, term, searchtype):
         nlinks = 0
         previousurl = ""
         while nlinks < self._LIMIT:
@@ -537,11 +514,22 @@ class Yahoo(SearchEngine):
                 print(str(ex))
 
         self.writeToFile()
-        print('Wrote to file', len(self.results), "links", term, 'BBB', 'sleeping...')
+        print('Wrote to file', len(self.results), "links", term, searchtype, 'sleeping...')
         self.randomSleep()
         self.results = []
 
-    def getBbbResults(self, term):
+    def getFbResults(self, term, geturl=False):
+        '''
+        fb: https://www.google.com/search?"Page created - January 01, 2021" inurl:facebook.com intitle:Home Improvement
+        '''
+        query = f'{self.fb_q} site:facebook.com intitle:{term}'
+        url = self.url + urlencode({'p': query, 'b': '0'})
+        if geturl:
+            print(url)
+            return
+        self.getYahooResults(url, term, 'facebook')
+
+    def getBbbResults(self, term, geturl=False):
         '''
         # '"Accredited Since:{month}/{day}/{year}" intitle:Construction site:bbb.org'
         '''
@@ -552,117 +540,12 @@ class Yahoo(SearchEngine):
              url = self.url + urlencode({'p': query,'fr2': 'time', 'age': f'1{bbbtime}', 'btf': bbbtime , 'b': '0'})
         else:
             url = self.url + urlencode({'p': query, 'b': '0'})
-        
-        nlinks = 0
-        previousurl = ""
+        if geturl:
+            print(url)
+            return
+        self.getYahooResults(url, term, 'BBB')
 
-        while nlinks < self._LIMIT:
-            # agent = self.agents[random.randrange(len(self.agents))]
-            agent = self.agents[random.randrange(len(self.agents))]
-            headers = {"user-agent" : agent}
-            if url == previousurl:
-                break
-            previousurl = url
-            try:
-                html = requests.get(url, headers=headers)
-                if html.status_code == 200:
-                    soup = BeautifulSoup(html.text, 'html.parser')
-                    # results = soup.find(id="results")
-                    results = soup.find("ol", {"class": "searchCenterMiddle"})
-                    listofdivs =  results.find_all("div", {"class": "options-toggle"})
-                    for div in listofdivs:
-                        try:
-                            a = div.find('a')
-                            href = a.get('href')
-                            href =  unquote(href)
-                            if re.search(r'^https?://r.search.yahoo', href):
-                                real = re.search('(https?://.*)//?RK', href[5:])
-                                if real:
-                                    href = real.group(1)
-                            self.results.append({
-                                "link": href,
-                                "site": urlparse(href).netloc,
-                                "engine": "yahoo",
-                                "term": term,
-                                "date": self.date.strftime("%Y/%m/%d")
-                            })
-                            nlinks += 1
-                        except:
-                            continue
-                    next = soup.find('a', {"class": "next"})
-                    if next:
-                        href = next.get('href')
-                        href = unquote(href)
-                        npage = re.search("&b=(\d\d?\d?)", href).group(1)
-                        url = re.sub(r"&b=(\d\d?\d?)", f'&b={npage}', url)
-
-            except Exception as ex:
-                print(str(ex))
-
-        self.writeToFile()
-        print('Wrote to file', len(self.results), "links", term, 'BBB', 'sleeping...')
-        self.randomSleep()
-        self.results = []
-
-
-
-
-
-            # try:
-            #     html = requests.get(url, headers=headers)
-            #     if html.status_code == 200:
-            #         soup = BeautifulSoup(html.text, 'html.parser')
-            #         results = soup.find(id="results")
-            #         # mydivs = soup.findAll("div", {"class": "stylelistrow"})
-            #         links = results.find_all('a')
-
-            #         for link in links:
-            #             try:
-            #                 href = link.get('href')
-            #                 href =  unquote(href)
-            #                 href = re.search('(https?://www\.facebook.*)//', href).group(1)
-            #             except: 
-            #                 if re.match('https?://search.yahoo.com/search', link.get('href')):
-            #                     href = ''
-            #                     pass
-            #                 else:
-            #                     continue
-            #             try:
-            #                 m = re.search(r"(?P<url>https?://[^\s]+)", href)
-            #                 n = m.group('url')
-            #                 rul = n.split('&')[0]
-            #                 domain = urlparse(rul)
-            #                 if re.search('yahoo.com', domain.netloc):
-            #                     continue
-            #                 else:
-            #                     self.results.append({
-            #                         "link": rul,
-            #                         "site": 'facebook',
-            #                         "engine": "yahoo",
-            #                         "term": term,
-            #                         "date": self.date.strftime("%Y/%m/%d")
-            #                     })
-            #                     nlinks += 1
-            #             except AttributeError as ex:
-            #                 if link.text == 'Next':
-            #                     href = link.get('href')
-            #                     href = unquote(href)
-            #                     npage = re.search("&b=(\d\d?\d?)", href).group(1)
-            #                     url = re.sub(r"&b=(\d\d?\d?)", f'&b={npage}', url)
-            #                     break
-            #                 continue
-            #             except Exception as ex:
-            #                 continue
-            # except Exception as ex:
-            #     print(str(ex))
-
-            # self.writeToFile()
-            # print('Wrote to file', len(self.results), "links", term, 'BBB', 'sleeping...')
-            # self.randomSleep()
-            
-            # self.results = []
-
-    def getWixResults(self, term):
+    def getWixResults(self, term, geturl=False):
         """
         # s = intext:Proudly created with Wix.com "construction"
         """
@@ -674,88 +557,12 @@ class Yahoo(SearchEngine):
             url = self.url + urlencode({'p': query,'fr2': 'time', 'age': f'1{wixtime}', 'btf': wixtime , 'b': '0'})
         else:
             url = self.url + urlencode({'p': query, 'b': '0'})
+
+        if geturl:
+            print(url)
+            return
+        self.getYahooResults(url, term, "Wix")
         
-        nlinks = 0
-        previousurl = ""
-        while nlinks < self._LIMIT:
-            # agent = self.agents[random.randrange(len(self.agents))]
-            agent = self.agents[random.randrange(len(self.agents))]
-            headers = {"user-agent" : agent}
-            if url == previousurl:
-                break
-            previousurl = url
-            try:
-                html = requests.get(url, headers=headers)
-                if html.status_code == 200:
-                    soup = BeautifulSoup(html.text, 'html.parser')
-                    # results = soup.find(id="results")
-                    results = soup.find("ol", {"class": "searchCenterMiddle"})
-                    listofdivs =  results.find_all("div", {"class": "options-toggle"})
-                    for div in listofdivs:
-                        try:
-                            a = div.find('a')
-                            href = a.get('href')
-                            href =  unquote(href)
-                            if re.search(r'^https?://r.search.yahoo', href):
-                                real = re.search('(https?://.*)//?RK', href[5:])
-                                if real:
-                                    href = real.group(1)
-                            self.results.append({
-                                "link": href,
-                                "site": urlparse(href).netloc,
-                                "engine": "yahoo",
-                                "term": term,
-                                "date": self.date.strftime("%Y/%m/%d")
-                            })
-                            nlinks += 1
-                        except:
-                             continue
-                    next = soup.find('a', {"class": "next"})
-                    if next:
-                        href = next.get('href')
-                        href = unquote(href)
-                        npage = re.search("&b=(\d\d?\d?)", href).group(1)
-                        url = re.sub(r"&b=(\d\d?\d?)", f'&b={npage}', url)
-
-            except Exception as ex:
-                print(str(ex))
-
-        self.writeToFile()
-        print('Wrote to file', len(self.results), "links", term, 'BBB', 'sleeping...')
-        self.randomSleep()
-        self.results = []
-
-
-
-
-
-
-                        # try:
-                        #     href = link.get('href')
-                        #     # href = re.search('(https?://www\.facebook.*)//', href).group(1)
-                        #     x=2
-                        # except: 
-                        #     if re.match('https?://search.yahoo.com/search', link.get('href')):
-                        #         href = ''
-                        #         pass
-                        #     else:
-                        #         continue
-                        # try:
-                        #     m = re.search(r"(?P<url>https?://[^\s]+)", href)
-                        #     n = m.group('url')
-                        #     rul = n.split('&')[0]
-                        #     domain = urlparse(rul)
-                        #     if re.search('yahoo.com', domain.netloc):
-                        #         continue
-                        #     else:
-
-                        # except AttributeError as ex:
-                        # except Exception as ex:
-                        #     continue
-        
-
-
-
 
 def test_yahooFormatUrl():
     expected = 'https://search.yahoo.com/search?p=%22Page+created+-+February+5%2C+2021%22+site%3A+facebook.com+intitle%3A+Home+Improvement&b=0'
@@ -792,7 +599,7 @@ if __name__ == '__main__':
     # b.getSearchResults('wix')
     # y = Yahoo(outfile="yahoo8.csv", date=d)
     y = Yahoo()
-    y.getSearchResults('fb')
+    y.getSearchResults()
 
 
 

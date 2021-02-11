@@ -14,10 +14,10 @@ import datetime as dt
 ##################################### Dates #######################################
 # searchday applies to the facebook search term and changes the name of the outputfile
 # searchday = dt.datetime.today()
-searchday = dt.datetime.today() - dt.timedelta(days=1)
+# searchday = dt.datetime.today() - dt.timedelta(days=1)
 
 # datetime is (yyyy, m, d, h, min, sec) Time is optional.
-# searchday = dt.datetime(2021, 1, 1)
+searchday = dt.datetime(2021, 2, 9)
 # searchday = dt.datetime(2021, 1, 1, 9, 30, 0)
 
 
@@ -41,7 +41,8 @@ bingcustomdate = (dt.datetime(2020, 11, 1), dt.datetime(2021, 2, 5))
 # To include quotes, use a combination of single quotes and double quote.
 
 # runsearches may be one of 'all', 'bbb', 'fb', 'wix' or an array like ['fb', 'bbb']
-runsearches = 'fb'
+# runsearches = 'bbb'
+runsearches = 'all'
 
 fb_q = '"Page created - {month} {day}, {year}"'
 # bbb_q = '"Accredited Since:{day}/{month}/{year}"'
@@ -65,7 +66,7 @@ randomsleep = (.5, 1.1)
 
 # Limit the number of links harvested per search term
 # LIMIT = 1440
-LIMIT = 104
+LIMIT = 22
 
 
 ########### Do not alter below line ##################################################
