@@ -47,9 +47,8 @@ searchengines = {
     "yahoo": ["https://www.yahoo.com/search?", "p"]
 }
 
-# Should the wix have a site parameter.. try it w and without before asking
 searchmodel = {
     "wix": ['', 'intext:Proudly created with Wix.com', '"construction"'],
-    "bbb": ['inurl:bbb.org',  '"Accredited Since:2/5/2021"',  'intitle:Construction'],
-    "google": ['Page created - February 5, 2021',  "site:facebook.com", 'intitle:"Home Improvement"']
+    "bbb": ['inurl:bbb.org', '"Accredited Since:2/5/2021"', 'intitle:Construction'],
+    "google": ['Page created - February 5, 2021', "site:facebook.com", 'intitle:"Home Improvement"']
 }

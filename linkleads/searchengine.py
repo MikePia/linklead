@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import csv
 import datetime as dt
-import json
 import os
 import random
 import re
@@ -10,7 +9,6 @@ import time
 from urllib.parse import urlparse, urlencode, unquote
 
 from linkleads.agents import agents
-from linkleads.terms import terms
 from linkleads.terms import terms
 import linkleads.searchterms as st
 
@@ -23,17 +21,18 @@ result = {
     "term": None
 }
 
+
 class SearchEngine:
     outfile = ''
     date = None
     url = None
-    _LIMIT=1000
+    _LIMIT = 1000
     results = []
     terms = terms
-    fb_q = None #'"Page created - {month} {day}, {year}"'
-    bbb_q = None # '"Accredited Since:{month}/{day}/{year}" intitle: Construction inurl: bbb.org '
-    headers = ['link', 'site', 'engine','term']
-    config=True
+    fb_q = None  # '"Page created - {month} {day}, {year}"'
+    bbb_q = None  # '"Accredited Since:{month}/{day}/{year}" intitle: Construction inurl: bbb.org '
+    headers = ['link', 'site', 'engine', 'term']
+    config = True
 
     def __init__(self, outfile=None, date=None, config=True):
         self.config = config
@@ -62,7 +61,7 @@ class SearchEngine:
         assert isinstance(self.date, dt.datetime)
 
         writeheader = True
-        if self.forceoverwrite == False:
+        if self.forceoverwrite is False:
             if os.path.exists(self.outfile):
                 with open(self.outfile, 'r', newline='', encoding='utf-16') as file:
                     x = file.readline()
@@ -71,7 +70,7 @@ class SearchEngine:
         if writeheader:
             self.writeToFile(mode="w", data=[{k: v for k, v in zip(self.headers, self.headers)}])
         self.agents = agents
-                       
+
     def getSearchResults(self, searches=None):
         searches = searches if searches else self.runsearches
 
@@ -92,7 +91,6 @@ class SearchEngine:
     def getWixResults(self, query):
         raise NotImplementedError("SearchEngine is a virtual class. Instantiate a specific search engine")
 
-
     def replaceSpaces(self, s, ch='+'):
         query = re.sub(r"\s+", ch, s)
         return query
@@ -110,7 +108,7 @@ class SearchEngine:
                     csv_file.writerow([item['link'], item['site'], item['engine'], item['term']])
                 except:
                     print(f'failed to write link: {item["link"]}')
-    
+
     def randomSleep(self):
         if self.randomsleep is not None:
             time.sleep(self.randomsleep[0] + random.random() * self.randomsleep[1])
@@ -126,7 +124,7 @@ class Google(SearchEngine):
         previousurl = ""
         while nlinks < self._LIMIT:
             agent = self.agents[0]
-            headers = {"user-agent" : agent}
+            headers = {"user-agent": agent}
             if url == previousurl:
                 break
             previousurl = url
@@ -137,7 +135,7 @@ class Google(SearchEngine):
                     links = soup.find_all('a')
                     for link in links:
                         href = link.get('href')
-                        if not href: 
+                        if not href:
                             continue
                         try:
                             m = re.search(r"(?P<url>https?://[^\s]+)", href)
@@ -155,7 +153,7 @@ class Google(SearchEngine):
                                     "date": self.date.strftime("%Y/%m/%d")
                                 })
                                 nlinks += 1
-                        except AttributeError as ex:
+                        except AttributeError:
                             if link.text and link.text.startswith('Next') & href.startswith('/search?'):
                                 x = re.search("&start=([0-9]+)", href)
                                 if x and x.group(1):
@@ -187,7 +185,7 @@ class Google(SearchEngine):
 
         if geturl:
             return url
-            
+
         self.getGoogleResults(url, term, 'facebook')
 
     def getBbbResults(self, term, geturl=False):
@@ -208,7 +206,6 @@ class Google(SearchEngine):
         print('notimplemnted')
 
 
-
 class Bing(SearchEngine):
     def __init__(self, outfile=None, date=None, config=True):
         super().__init__(outfile, date, config)
@@ -216,16 +213,14 @@ class Bing(SearchEngine):
         self.fb_q = self.fb_q.format(self.date.strftime("%B"),
                                      str(self.date.day),
                                      self.date.strftime("%Y"))
-    
-        
+
     def getBingResults(self, url, term, searchtype):
-        nglinks = 0
         nlinks = 0
         previousurl = ""
         while nlinks < self._LIMIT:
             # agent = self.agents[random.randrange(len(self.agents))]
             agent = self.agents[0]
-            headers = {"user-agent" : agent}
+            headers = {"user-agent": agent}
             if url == previousurl:
                 break
             previousurl = url
@@ -234,7 +229,7 @@ class Bing(SearchEngine):
                 if html.status_code == 200:
                     soup = BeautifulSoup(html.text, 'html.parser')
                     links = soup.find_all('a')
-                    
+
                     for link in links:
                         href = link.get('href')
                         if not href:
@@ -255,13 +250,13 @@ class Bing(SearchEngine):
                                     "date": self.date.strftime("%Y/%m/%d")
                                 })
                                 nlinks += 1
-                        except AttributeError as ex:
-                            if link.get('title') and  link.get('title').startswith('Next') & href.startswith('/search?'):
-                                npage = re.search("&first=(\d\d?\d?)", href).group(1)
+                        except AttributeError:
+                            if link.get('title') and link.get('title').startswith('Next') & href.startswith('/search?'):
+                                npage = re.search(r"&first=(\d\d?\d?)", href).group(1)
                                 url = re.sub(r"&first=(\d\d?\d?)", f'&first={npage}', url)
                                 break
                             continue
-                        except Exception as ex:
+                        except Exception:
                             continue
             except Exception as ex:
                 print(str(ex))
@@ -289,16 +284,16 @@ class Bing(SearchEngine):
             return url
 
         self.getBingResults(url, term, 'BBB')
-        
+
     def getWixResults(self, term, geturl=False):
         query = f'{self.wix_q}  intitle:{term}'
         url = self.url + urlencode({'q': query, 'pq': query.lower(), 'qs': 'n', 'form': 'QBRE', 'sp': '-1', 'filters': self.bingwixtime, 'first': '0'}, safe=':')
-        
+
         if geturl:
             return url
 
         self.getBingResults(url, term, 'Wix')
-        
+
 
 class Yahoo(SearchEngine):
     '''
@@ -308,14 +303,13 @@ class Yahoo(SearchEngine):
     def __init__(self, outfile=None, date=None, config=True):
         super().__init__(outfile, date, config)
         self.url = 'https://search.yahoo.com/search?'
-    
 
     def getYahooResults(self, url, term, searchtype):
         nlinks = 0
         previousurl = ""
         while nlinks < self._LIMIT:
             agent = self.agents[random.randrange(len(self.agents))]
-            headers = {"user-agent" : agent}
+            headers = {"user-agent": agent}
             if url == previousurl:
                 break
             previousurl = url
@@ -325,12 +319,12 @@ class Yahoo(SearchEngine):
                     soup = BeautifulSoup(html.text, 'html.parser')
                     # results = soup.find(id="results")
                     results = soup.find("ol", {"class": "searchCenterMiddle"})
-                    listofdivs =  results.find_all("div", {"class": "options-toggle"})
+                    listofdivs = results.find_all("div", {"class": "options-toggle"})
                     for div in listofdivs:
                         try:
                             a = div.find('a')
                             href = a.get('href')
-                            href =  unquote(href)
+                            href = unquote(href)
                             if re.search(r'^https?://r.search.yahoo', href):
                                 real = re.search(r'(https?://.*)//?RK', href[5:])
                                 if real:
@@ -349,7 +343,7 @@ class Yahoo(SearchEngine):
                     if next:
                         href = next.get('href')
                         href = unquote(href)
-                        npage = re.search("&b=(\d\d?\d?)", href).group(1)
+                        npage = re.search(r"&b=(\d\d?\d?)", href).group(1)
                         url = re.sub(r"&b=(\d\d?\d?)", f'&b={npage}', url)
 
             except Exception as ex:
@@ -368,7 +362,7 @@ class Yahoo(SearchEngine):
         url = self.url + urlencode({'p': query, 'b': '0'})
         if geturl:
             return url
-            
+
         self.getYahooResults(url, term, 'facebook')
 
     def getBbbResults(self, term, geturl=False):
@@ -376,9 +370,9 @@ class Yahoo(SearchEngine):
         # '"Accredited Since:{month}/{day}/{year}" intitle:Construction site:bbb.org'
         '''
         query = f'{self.bbb_q} intitle:{term} site:bbb.org'
-        bbbtime =  self.yahoobbbtime if self.yahoobbbtime and self.yahoobbbtime in ['d', 'w', 'm'] else ''
+        bbbtime = self.yahoobbbtime if self.yahoobbbtime and self.yahoobbbtime in ['d', 'w', 'm'] else ''
         if bbbtime:
-             url = self.url + urlencode({'p': query,'fr2': 'time', 'age': f'1{bbbtime}', 'btf': bbbtime , 'b': '0'})
+            url = self.url + urlencode({'p': query, 'fr2': 'time', 'age': f'1{bbbtime}', 'btf': bbbtime, 'b': '0'})
         else:
             url = self.url + urlencode({'p': query, 'b': '0'})
         if geturl:
@@ -392,10 +386,10 @@ class Yahoo(SearchEngine):
         """
         # intitle seach in body and title
         query = f'intext:{self.wix_q} "{term}"'
-        wixtime =  self.yahoowixtime if self.yahoowixtime and self.yahoowixtime in ['d', 'w', 'm'] else ''
+        wixtime = self.yahoowixtime if self.yahoowixtime and self.yahoowixtime in ['d', 'w', 'm'] else ''
         if wixtime:
-            # &fr2=time&age=1d&btf=d 
-            url = self.url + urlencode({'p': query,'fr2': 'time', 'age': f'1{wixtime}', 'btf': wixtime , 'b': '0'})
+            # &fr2=time&age=1d&btf=d
+            url = self.url + urlencode({'p': query, 'fr2': 'time', 'age': f'1{wixtime}', 'btf': wixtime, 'b': '0'})
         else:
             url = self.url + urlencode({'p': query, 'b': '0'})
 
@@ -403,14 +397,16 @@ class Yahoo(SearchEngine):
             return url
 
         self.getYahooResults(url, term, "Wix")
-        
+
 
 def test_yahooFormatUrl():
     expected = 'https://search.yahoo.com/search?p=%22Page+created+-+February+5%2C+2021%22+site%3A+facebook.com+intitle%3A+Home+Improvement&b=0'
+    print(expected)
     # input = 'Home Improvement'
     # y = Yahoo(outfile="yahoo8.csv", date=dt.datetime.today())
     # result = y.formatUrl(input, '0')
     # assert result == expected
+
 
 def test_dateSetup():
     g = Google(config=True)
@@ -427,9 +423,10 @@ def test_dateSetup():
     assert y.bbb_q == st.bbbsearch
     assert b.wix_q == st.wix_q
 
-    g = Google(date=dt.datetime(2021,1,1,1,1,1))
+    g = Google(date=dt.datetime(2021, 1, 1, 1, 1, 1))
     expectedout = st.outf.format(g.date.strftime("%Y%m%d_%H-%M-%S"))
     assert g.outfile == expectedout
+
 
 if __name__ == '__main__':
     # test_dateSetup()
@@ -441,6 +438,3 @@ if __name__ == '__main__':
     # y = Yahoo(outfile="yahoo8.csv", date=d)
     # y = Yahoo()
     # y.getSearchResults()
-
-
-
