@@ -44,9 +44,11 @@ class SearchEngine:
             self.outfile = st.outfile
             self.date = st.searchday
             self.bingbbbtime = st.bingbbbtime
+            self.googlecustomdate = st.googlecustomdate
             self.yahoobbbtime = st.yahoobbbtime
             self.bingwixtime = st.bingwixtime
             self.yahoowixtime = st.yahoowixtime
+            self.googlewixtime = st.googlewixtime
             self.fb_q = st.fbsearch
             self.bbb_q = st.bbbsearch
             self.wix_q = st.wix_q
@@ -181,7 +183,7 @@ class Google(SearchEngine):
         fb: https://www.google.com/search?"Page created - January 01, 2021" inurl:facebook.com intitle:Home Improvement
         '''
         query = f'{self.fb_q} inurl:facebook.com intitle:{term}'
-        url = self.url + urlencode({'q': query, 'oq': query, 'start': 0})
+        url = self.url + urlencode({'q': query, 'oq': query.lower(), 'start': 0})
 
         if geturl:
             return url
@@ -190,20 +192,39 @@ class Google(SearchEngine):
 
     def getBbbResults(self, term, geturl=False):
         '''
+        Accredited Since:{month}/{day}/{year}" intitle: Construction inurl: bbb.org
         bbb: https://www.google.com/search?&as_q=Construction&as_qdr=d&as_sitesearch=bbb.org&as_occt=title&start=0
         '''
 
-        query = f'{self.fb_q} site: facebook.com intitle: {term}'
-        # query = '"Page created - February 7, 2021" site: facebook.com intitle: Home Improvement'
+        query = f'{self.bbb_q} site:bbb.org intitle:{term}'
         url = self.url + urlencode({'q': query, 'pq': query.lower(), 'qs': 'n', 'form': 'QBRE', 'sp': '-1', 'first': '0'})
 
         if geturl:
             return url
 
-        self.getBingResults(url, term, 'BBB')
+        self.getGoogleResults(url, term, 'BBB')
 
-    def getWixResults(self, query):
-        print('notimplemnted')
+    def getWixResults(self, term, geturl=False):
+        '''
+        intext:Proudly created with Wix.com "construction"
+        '''
+        query = f'intext:{self.wix_q} "{term}"'
+        tpar = 'as_qdr'
+        # wixtime = self.goog
+        if self.googlewixtime == 'c':
+            wixtime = self.googlecustomdate
+            tpar = 'tbs'
+        else:
+            wixtime = self.googlewixtime if self.googlewixtime in ['h', 'd', 'w', 'm'] else ''
+        if wixtime:
+            url = self.url + urlencode({'q': query, 'oq': query.lower(), tpar: wixtime, 'start': 0})
+        else:
+            url = self.url + urlencode({'q': query, 'oq': query.lower(), 'start': 0})
+
+        if geturl:
+            return url
+
+        self.getGoogleResults(url, term, "Wix")
 
 
 class Bing(SearchEngine):
@@ -431,7 +452,7 @@ def test_dateSetup():
 if __name__ == '__main__':
     # test_dateSetup()
     g = Google()
-    g.getSearchResults('fb')
+    g.getSearchResults('wix')
     # d = dt.datetime(2021, 2, 5)
     # b = Bing()
     # b.getSearchResults('wix')

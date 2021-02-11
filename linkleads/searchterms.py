@@ -23,15 +23,14 @@ searchday = dt.datetime(2021, 2, 9)
 
 # timebbt  applies to bbb searches only currently and sets the engine time to previous day, or week or a custom time (for bing)
 # timewix  applies to wix searches only currently and sets the engine time to previous day, or week or a custom time (for bing)
-# available values are ["d", "w", "m", "y", 'c']
+# available values are ["d", "w", "m", 'c']
 # c is for custom, If you you choose custom, then then custom dates needs to be filled in
-# Implementing day week and month only because noting else is supported by all three
 # Note that Yahoo has d, w, m only anything else disables it for yahoo searches
 
 timebbb = ''
-timewix = 'm'
+timewix = 'c'
 
-bingcustomdate = (dt.datetime(2020, 11, 1), dt.datetime(2021, 2, 5))
+customdate = (dt.datetime(2020, 11, 1), dt.datetime(2021, 2, 5))
 
 
 # ############################ Search Terms #######################################
@@ -83,7 +82,18 @@ def getBingCustomDates(beg, end):
     return f'ex1:"ez5_{begn}_{endn}"'
 
 
+def getGoogleCustomDates(beg, end):
+    '''
+    &tbs=cdr:1,cd_min:1/1/2021,cd_max:2/10/2021
+    I think you can also set the min or the max only
+    &tbs=cdr:1,cd_min:2/1/2021
+    would be since feb 1
+    '''
+    return f'cdr:1,cd_min:{beg.month}/{beg.day}/{beg.year},cd_max:{end.month}/{end.day}/{end.year}'
+
+
 def getBingTimeParam(tt):
+    global customdate
     if not tt:
         return ''
     assert tt in ['d', 'w', 'm', 'y', 'c']
@@ -91,7 +101,8 @@ def getBingTimeParam(tt):
         if tt == 'y':
             bt = getBingCustomDates(dt.datetime.today() - dt.timedelta(days=365), dt.datetime.today(), )
         else:
-            bt = getBingCustomDates(*bingcustomdate)
+            bt = getBingCustomDates(*customdate)
+   
     else:
         bt = {'d': 'ex1:"ez1"', 'w': 'ex1:"ez2"', 'm': 'ex1:"ez3"'}[tt]
     return bt
@@ -110,12 +121,15 @@ def formatTerms(dadate=None):
     bbb = bbb_q.format(day=dadate.day, month=dadate.month, year=dadate.year) if bbb_q else ''
     out = outf.format(dadate.strftime("%Y%m%d_%H-%M-%S"))
     bbt = getBingTimeParam(timebbb)
+    ggt = getGoogleCustomDates(*customdate)
     ybt = timebbb if timebbb in ['d', 'w', 'm'] else ''
     bwt = getBingTimeParam(timewix)
     ywt = timewix if timewix in ['d', 'w', 'm'] else ''
+    gwt = timewix
 
-    return fb, bbb, out, bbt, ybt, bwt, ywt
+    return fb, bbb, out, bbt, ggt, ybt, bwt, ywt, gwt
 
 
-fbsearch, bbbsearch, outfile, bingbbbtime, yahoobbbtime, bingwixtime, yahoowixtime = formatTerms()
+(fbsearch, bbbsearch, outfile, bingbbbtime, googlecustomdate,
+ yahoobbbtime, bingwixtime, yahoowixtime, googlewixtime) = formatTerms()
 print()
