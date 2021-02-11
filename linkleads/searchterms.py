@@ -29,7 +29,7 @@ searchday = dt.datetime(2021, 2, 9)
 # Note that Yahoo has d, w, m only anything else disables it for yahoo searches
 
 timebbb = ''
-timewix = 'd'
+timewix = 'm'
 
 bingcustomdate = (dt.datetime(2020, 11, 1), dt.datetime(2021, 2, 5))
 
@@ -61,7 +61,7 @@ forceoverwrite = False
 
 ############################# misc ############################
 # Introduce time between new searches so as not to tax the server and or get 429'd. 
-randomsleep = (.5, 1.1)
+randomsleep = (5, 10)
 # randomsleep = None
 
 # Limit the number of links harvested per search term
