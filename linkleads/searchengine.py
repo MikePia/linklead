@@ -5,6 +5,7 @@ import os
 import random
 import re
 import requests
+import sys
 import time
 from urllib.parse import urlparse, urlencode, unquote
 
@@ -49,6 +50,7 @@ class SearchEngine:
             self.bingwixtime = st.bingwixtime
             self.yahoowixtime = st.yahoowixtime
             self.googlewixtime = st.googlewixtime
+            self.googlebbbtime = st.googlebbbtime
             self.fb_q = st.fbsearch
             self.bbb_q = st.bbbsearch
             self.wix_q = st.wix_q
@@ -73,16 +75,16 @@ class SearchEngine:
             self.writeToFile(mode="w", data=[{k: v for k, v in zip(self.headers, self.headers)}])
         self.agents = agents
 
-    def getSearchResults(self, searches=None):
+    def getSearchResults(self, searches=None, geturl=False):
         searches = searches if searches else self.runsearches
 
         for term in self.terms:
             if 'all' in searches or 'fb' in searches:
-                self.getFbResults(term)
+                self.getFbResults(term, geturl)
             if 'all' in searches or 'bbb' in searches:
-                self.getBbbResults(term)
+                self.getBbbResults(term, geturl)
             if 'all' in searches or 'wix' in searches:
-                self.getWixResults(term)
+                self.getWixResults(term, geturl)
 
     def getFbResults(self, query):
         raise NotImplementedError("SearchEngine is a virtual class. Instantiate a specific search engine")
@@ -170,6 +172,8 @@ class Google(SearchEngine):
                     print("servererror", html.status_code, html.reason)
                     print('Interrupted gathering docs for term:', term)
                     print(url)
+                    print("exiting execution")
+                    sys.exit()
             except Exception as ex:
                 print(str(ex))
 
@@ -193,11 +197,19 @@ class Google(SearchEngine):
     def getBbbResults(self, term, geturl=False):
         '''
         Accredited Since:{month}/{day}/{year}" intitle: Construction inurl: bbb.org
-        bbb: https://www.google.com/search?&as_q=Construction&as_qdr=d&as_sitesearch=bbb.org&as_occt=title&start=0
         '''
 
         query = f'{self.bbb_q} site:bbb.org intitle:{term}'
-        url = self.url + urlencode({'q': query, 'pq': query.lower(), 'qs': 'n', 'form': 'QBRE', 'sp': '-1', 'first': '0'})
+        tpar = 'as_qdr'
+        if self.googlebbbtime == 'c':
+            bbbtime = self.googlecustomdate
+            tpar = 'tbs'
+        else:
+            bbbtime = self.googlebbbtime if self.googlebbbtime in ['h', 'd', 'w', 'm'] else ''
+        if bbbtime:
+            url = self.url + urlencode({'q': query, 'oq': query.lower(), tpar: bbbtime, 'start': 0})
+        else:
+            url = self.url + urlencode({'q': query, 'oq': query.lower(), 'start': 0})
 
         if geturl:
             return url
@@ -451,11 +463,11 @@ def test_dateSetup():
 
 if __name__ == '__main__':
     # test_dateSetup()
-    g = Google()
-    g.getSearchResults('wix')
+    # g = Google()
+    # g.getSearchResults('bbb')
     # d = dt.datetime(2021, 2, 5)
     # b = Bing()
     # b.getSearchResults('wix')
     # y = Yahoo(outfile="yahoo8.csv", date=d)
-    # y = Yahoo()
-    # y.getSearchResults()
+    y = Yahoo()
+    y.getSearchResults()

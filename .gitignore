@@ -9,3 +9,5 @@ notes.md
 *.ipynb*
 tmp*
 gpage
+*.pdf
+*.zip

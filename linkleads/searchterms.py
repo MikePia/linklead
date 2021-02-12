@@ -27,7 +27,7 @@ searchday = dt.datetime(2021, 2, 9)
 # c is for custom, If you you choose custom, then then custom dates needs to be filled in
 # Note that Yahoo has d, w, m only anything else disables it for yahoo searches
 
-timebbb = ''
+timebbb = 'w'
 timewix = 'c'
 
 customdate = (dt.datetime(2020, 11, 1), dt.datetime(2021, 2, 5))
@@ -60,7 +60,7 @@ forceoverwrite = False
 
 # ############################ misc ############################
 # Introduce time between new searches so as not to tax the server and or get 429'd.
-randomsleep = (5, 10)
+randomsleep = (15, 30)
 # randomsleep = None
 
 # Limit the number of links harvested per search term
@@ -102,7 +102,7 @@ def getBingTimeParam(tt):
             bt = getBingCustomDates(dt.datetime.today() - dt.timedelta(days=365), dt.datetime.today(), )
         else:
             bt = getBingCustomDates(*customdate)
-   
+
     else:
         bt = {'d': 'ex1:"ez1"', 'w': 'ex1:"ez2"', 'm': 'ex1:"ez3"'}[tt]
     return bt
@@ -126,10 +126,10 @@ def formatTerms(dadate=None):
     bwt = getBingTimeParam(timewix)
     ywt = timewix if timewix in ['d', 'w', 'm'] else ''
     gwt = timewix
+    gbt = timebbb
 
-    return fb, bbb, out, bbt, ggt, ybt, bwt, ywt, gwt
+    return fb, bbb, out, bbt, ggt, ybt, bwt, ywt, gwt, gbt
 
 
 (fbsearch, bbbsearch, outfile, bingbbbtime, googlecustomdate,
- yahoobbbtime, bingwixtime, yahoowixtime, googlewixtime) = formatTerms()
-print()
+ yahoobbbtime, bingwixtime, yahoowixtime, googlewixtime, googlebbbtime) = formatTerms()
