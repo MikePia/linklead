@@ -135,6 +135,8 @@ class Google(SearchEngine):
             try:
                 html = requests.get(url, headers=headers)
                 if html.status_code == 200:
+                    print(nlinks, 'sleeping...')
+                    self.randomSleep()
                     soup = BeautifulSoup(html.text, 'html.parser')
                     links = soup.find_all('a')
                     for link in links:
@@ -260,6 +262,8 @@ class Bing(SearchEngine):
             try:
                 html = requests.get(url, headers=headers)
                 if html.status_code == 200:
+                    print(nlinks, 'sleeping...')
+                    self.randomSleep()
                     soup = BeautifulSoup(html.text, 'html.parser')
                     links = soup.find_all('a')
 
@@ -310,8 +314,12 @@ class Bing(SearchEngine):
         self.getBingResults(url, term, 'facebook')
 
     def getBbbResults(self, term, geturl=False):
+        '''	&filters=ex1:"ez1'''
         query = f'{self.bbb_q} site:bbb.org intitle:{term}'
-        url = self.url + urlencode({'q': query, 'pq': query.lower(), 'qs': 'n', 'form': 'QBRE', 'sp': '-1', 'first': '0'})
+        if self.bingbbbtime:
+            url = self.url + urlencode({'q': query, 'pq': query.lower(), 'qs': 'n', 'form': 'QBRE', 'sp': '-1', 'filters': self.bingbbbtime, 'first': '0'})
+        else:
+            url = self.url + urlencode({'q': query, 'pq': query.lower(), 'qs': 'n', 'form': 'QBRE', 'sp': '-1', 'first': '0'})
 
         if geturl:
             return url
@@ -349,6 +357,8 @@ class Yahoo(SearchEngine):
             try:
                 html = requests.get(url, headers=headers)
                 if html.status_code == 200:
+                    print(nlinks, 'sleeping...')
+                    self.randomSleep()
                     soup = BeautifulSoup(html.text, 'html.parser')
                     # results = soup.find(id="results")
                     results = soup.find("ol", {"class": "searchCenterMiddle"})

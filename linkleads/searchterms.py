@@ -13,11 +13,11 @@ import datetime as dt
 
 # #################################### Dates #######################################
 # searchday applies to the facebook search term and changes the name of the outputfile
-# searchday = dt.datetime.today()
+searchday = dt.datetime.today()
 # searchday = dt.datetime.today() - dt.timedelta(days=1)
 
 # datetime is (yyyy, m, d, h, min, sec) Time is optional.
-searchday = dt.datetime(2021, 2, 9)
+# searchday = dt.datetime(2021, 2, 9)
 # searchday = dt.datetime(2021, 1, 1, 9, 30, 0)
 
 
@@ -27,9 +27,8 @@ searchday = dt.datetime(2021, 2, 9)
 # c is for custom, If you you choose custom, then then custom dates needs to be filled in
 # Note that Yahoo has d, w, m only anything else disables it for yahoo searches
 
-timebbb = 'w'
+timebbb = 'm'
 timewix = 'c'
-
 customdate = (dt.datetime(2020, 11, 1), dt.datetime(2021, 2, 5))
 
 
@@ -41,7 +40,7 @@ customdate = (dt.datetime(2020, 11, 1), dt.datetime(2021, 2, 5))
 
 # runsearches may be one of 'all', 'bbb', 'fb', 'wix' or an array like ['fb', 'bbb']
 # runsearches = 'bbb'
-runsearches = 'all'
+runsearches = 'wix'
 
 fb_q = '"Page created - {month} {day}, {year}"'
 # bbb_q = '"Accredited Since:{day}/{month}/{year}"'
@@ -60,12 +59,12 @@ forceoverwrite = False
 
 # ############################ misc ############################
 # Introduce time between new searches so as not to tax the server and or get 429'd.
-randomsleep = (15, 30)
+randomsleep = (2, 5)
 # randomsleep = None
 
 # Limit the number of links harvested per search term
 # LIMIT = 1440
-LIMIT = 22
+LIMIT = 20
 
 
 # ########## Do not alter below line ##################################################

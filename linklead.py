@@ -30,5 +30,5 @@ p.add_argument('-g',
                default=False,
                help="Run searches using Google")
 
-args = p.parse_args()
-runLinkedLeads(args)
+ahgs = p.parse_args()
+runLinkedLeads(ahgs)

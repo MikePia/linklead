@@ -17,11 +17,11 @@ def runLinkedLeads(args):
         for engine in searchEngines:
             if engine == 'bing':
                 b = Bing()
-                b.getSearchResults(geturl=True)
+                b.getSearchResults()
             if engine == 'yahoo':
                 y = Yahoo()
                 y.getSearchResults()
-            if engine == 'bing':
+            if engine == 'google':
                 g = Google()
                 g.getSearchResults()
     except KeyboardInterrupt:

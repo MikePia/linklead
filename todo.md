@@ -1,20 +1,27 @@
+# Priority
+* Facebook data. Look into Facebook api and getting an agreement to scrape for particular data.
+
 ## MVP
-* Scrape search pages for facebook, Wix and BBB using the given 20 terms. 
+* Scrape search pages using Google, Bing, and Yahoo for facebook, Wix and BBB searches using the given 20 terms. 
 * Write all results to a csv file. * 
 * The Command line call will do all the searches by default and write all results to a single file
 
 ## Possible Todos
 * handle duplicates. (Don't have a policy howto yet)
-* Customization of search parameters using an input file
-* Customization of search parameters using Command line
-* Customize LIMIT on the command line
-* Specify which search engines on commandline
-* Specify which sites to do on the command line (of the 3 current supported)
+* Enable a continue mode so it starts on the term it left off where it left off
+* Change the filname to include all the info like ***filename_bing_goog_yahoo_fb_wix_20210212_12-35-11.csv***
+* More customization of search parameters using Command line
 * Embed in web or gui standalone app with results going to the screen
-* scrapers for business info for the three sites. 
+* scrapers to harvest the biz info from the links
     * Look for libraries/tools that already do the facebook scraping
     * See if I can get a facebook agreement so I can develop it
-* harvest more than just the link
+* harvest more information from the search pages
+* Enable more search engines
+* Use rotating proxies to decrease the chance of getting blocked
+* Use a javascript runner to pop up the link when you get blocked so you can click on the captcha
+* Automate it, many variables here
+
+
 
 ## MVP Develop stuff
 * Put the bulk of the code in SearchEngine class to share
