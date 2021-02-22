@@ -1,7 +1,11 @@
 from linkleads.searchengine import Bing, Yahoo, Google
+from linkleads.version import version
 
 
 def runLinkedLeads(args):
+    if args.version:
+        print('linklead version ' + version)
+        exit(0)
     print('\nSearch Running. Press Ctrl-C to cancel\n')
     searchEngines = []
     if args.all:

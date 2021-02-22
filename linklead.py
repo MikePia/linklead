@@ -29,6 +29,11 @@ p.add_argument('-g',
                action='store_true',
                default=False,
                help="Run searches using Google")
+p.add_argument('-v',
+               '--version',
+               action='store_true',
+               default=False,
+               help="Show the version and exit")
 
 ahgs = p.parse_args()
 runLinkedLeads(ahgs)
