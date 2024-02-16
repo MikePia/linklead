@@ -1,4 +1,4 @@
-## Command line program to automate finding new Home Improvement contractor leads
+## Command line program to automate finding new Home Improvement contractor leads from Facebook and WIX using Google, Bing and Yahoo
 
 Commandline program [linkedlead.py](linkedlead.py)
 Ways to run the program
